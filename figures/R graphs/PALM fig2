@@ -1,0 +1,36 @@
+```{r}
+df <- data.frame(
+  place <- c("Total", "Tonga"),
+  `2022` <- c(26185, 6035),
+  `2024` <- c(30705, 3175)
+)
+
+theme_set(theme_classic())
+colnames(df)<- c("Place","2022", "2025")
+left_label <- paste(df$Place, round(df$`2022`),sep=", ")
+right_label <- paste(df$Place, round(df$`2025`),sep=", ")
+df$class <- ifelse((df$`2025` - df$`2022`) < 0, "red", "green")
+
+# Plot
+p <- ggplot(df) + geom_segment(aes(x=1, xend=2, y=`2022`, yend=`2025`, col=class), size=.75, show.legend=F) + 
+                  geom_vline(xintercept=1, linetype="dashed", size=.1) + 
+                  geom_vline(xintercept=2, linetype="dashed", size=.1) +
+                  scale_color_manual(labels = c("Up", "Down"), 
+                                     values = c("green"="#00ba38", "red"="#f8766d")) +  # color of lines
+                  labs(x="", y="Workers (PALM)") +  # Axis labels
+                  xlim(.5, 2.5) + ylim(0,1.1*((max(df$`2022`, df$`2025`))))  # X and Y axis limits
+
+# Add text
+p <- p + geom_text(label=left_label, y=df$`2022`, x=rep(1, NROW(df)), hjust=1.1, size=3.5)
+p <- p + geom_text(label=right_label, y=df$`2025`, x=rep(2, NROW(df)), hjust=-0.1, size=3.5)
+p <- p + geom_text(label="Year 2022", x=1, y=1.1*(max(df$`2022`, df$`2025`)), hjust=1.2, size=5)  # title
+p <- p + geom_text(label="Year 2025", x=2, y=1.1*(max(df$`2022`, df$`2025`)), hjust=-0.1, size=5)  # title
+
+# Minify theme
+p + theme(panel.background = element_blank(), 
+           panel.grid = element_blank(),
+           axis.ticks = element_blank(),
+           axis.text.x = element_blank(),
+           panel.border = element_blank(),
+           plot.margin = unit(c(1,2,1,2), "cm"))
+```
