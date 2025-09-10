@@ -1,0 +1,66 @@
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(hrbrthemes)
+library(babynames)
+library(viridis)
+
+
+
+df <- data.frame(
+  Date = c("Apr-22", "Dec-22", "Jun-23", "Jul-23", "Aug-23", "Sept-23", "Oct-23", "Nov-23", "Dec-23", "Jan-24", 
+           "Feb-24", "Mar-24", "Apr-24", "May-24", "Jun-24", "Jul-24", "Aug-24", "Sept-24", "Oct-24", "Nov-24", "Dec-24", "Jan-25"),
+  Total = c(26185, 29955, 34400, 34110, 33825, 33690, 33900, 32895, 29910, 32580, 
+            33245, 33680, 32560, 34230, 34320, 31950, 30805, 31230, 30800, 31305, 27620, 30705),
+  Fiji = c(1630, 4510, 6270, 6290, 6240, 6190, 6540, 5780, 5410, 5780, 
+           5680, 6020, 6020, 6475, 6695, 6365, 5995, 5830, 5915, 5740, 4865, 5315),
+  Kiribati = c(785, 800, 1220, 1285, 1245, 1300, 1430, 1445, 1425, 1540, 
+               1500, 1515, 1515, 1595, 1665, 1555, 1555, 1500, 1535, 1500, 1365, 1550),
+  Nauru = c(10, 5, 5, 5, 5, 5, 5, 5, 10, 15, 
+            15, 25, 25, 25, 35, 35, 35, 25, 35, 25, 50, 55),
+  PNG = c(385, 1085, 1610, 1665, 1735, 1765, 1765, 1735, 1415, 1690, 
+          1820, 1810, 1830, 1935, 1935, 1960, 1960, 1870, 2025, 2045, 2020, 2050),
+  Samoa = c(4085, 4130, 4125, 4005, 3805, 3605, 3605, 3375, 3215, 3380, 
+            3585, 3480, 3540, 3245, 3245, 2865, 2865, 2740, 2575, 2630, 2725, 2690),
+  Solomon_Islands = c(2925, 3370, 4590, 4690, 4840, 4945, 4890, 4985, 3980, 4530, 
+                      4760, 4730, 4730, 5120, 5085, 4820, 4820, 4870, 4570, 4745, 4450, 4645),
+  Timor_Leste = c(1715, 3405, 3375, 3340, 3525, 3940, 4015, 3895, 3865, 3850, 
+                  4245, 4230, 3960, 3750, 4750, 3760, 3760, 3430, 3390, 4735, 4425, 4865),
+  Tonga = c(6035, 4350, 5320, 5220, 4950, 4825, 4085, 3895, 3585, 3850, 
+            4070, 4070, 4070, 4165, 4165, 3980, 3980, 3830, 2995, 3025, 2725, 3175),
+  Tuvalu = c(10, 35, 80, 75, 75, 125, 135, 165, 185, 185, 
+             210, 210, 210, 260, 260, 310, 310, 300, 295, 310, 275, 295),
+  Vanuatu = c(8600, 8265, 7535, 7410, 7410, 7325, 7425, 7275, 6770, 6630, 
+              7085, 7035, 6635, 6375, 6375, 6120, 5985, 5835, 5900, 5885, 6060, 6060)
+)
+
+PALM_long <- df %>%
+  pivot_longer(cols = c(Fiji, Kiribati, Nauru, PNG, Samoa, Solomon_Islands, Timor_Leste, Tonga, Tuvalu, Vanuatu), names_to = "Category", values_to = "Workers")
+
+library(lubridate)
+PALM_long$Date <- parse_date_time(PALM_long$Date, "my")
+
+library(zoo)
+
+PALM_long$Date <- as.Date(as.yearmon(PALM_long$Date, "%b-%y"))
+
+
+PALM_long %>%
+  mutate( highlight = ifelse(Category == "Tonga", "Tonga", "Other")) %>%
+  ggplot(aes(x = Date, y = Workers, group = Category, color = highlight)) +
+  geom_line() +
+  scale_color_manual(values = c("lightgrey", "red")) +
+  scale_size_manual(values=c(2,0.2))+
+  scale_x_date(date_breaks = "3 months", date_labels = "%b-%y") +
+  ggtitle("PALM scheme intake from 2022-2025") +
+  theme_ipsum() +
+  geom_label(aes(x = as.Date("2024-02-01"), y = 5500, 
+                  label = "Tonga's PALM intake is declining"), 
+             color = "red", size = 3, label.size = 0.3)+
+  theme(
+    plot.title = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
