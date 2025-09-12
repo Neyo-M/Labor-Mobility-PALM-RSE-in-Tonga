@@ -23,6 +23,8 @@
 \usepackage{stfloats}     % Better float handling in two-column
 \usepackage{enumitem}     % Customize itemize
 \usepackage{adjustbox}    % Scale table if needed
+\usepackage{tikz}
+\usetikzlibrary{positioning, shapes, calc}
 
 % Compact itemize for tables
 \newenvironment{tabitemize}{%
@@ -85,7 +87,7 @@
 
 %----------------------------------------------------------
 
-\keywords{Labor Mobility Sceheme, PALM, RSE, Remittances, Tonga}
+\keywords{Labor Mobility Scheme, PALM, RSE, Remittances, Tonga}
 
 %----------------------------------------------------------
 
@@ -131,7 +133,7 @@
                 \bottomrule     
             \end{tabular}
 			
-            \tabletext{Source: \cite{Budget_Statement} Ministry of Finacne}
+            \tabletext{Source: \cite{Budget_Statement} Ministry of Finance}
 			
         \end{table}
  %The key drivers of these vacancies are identified \\ \textbf{(i)} Higher compensation available for technical positions on donor funded projects \\ \textbf{(ii)} Migration. \\
@@ -372,22 +374,20 @@ In final, for Tonga, where 67\% of PALM workers rely on short-term roles, this t
 
         In conjunction with Tonga's decline in ST PALM roles, the RSE scheme benefits from this. There is less direct competition from Australia's seasonal scheme at the enterprise level. Tonga's HIES (2021) indicated a number Tongans experimented with the short-term role employments for both schemes, yet no major shift has realized between the worker numbers from one scheme to another. Moreover, major source countries: Vanuatu, Samoa, and Tonga gave serious scrutiny towards aspects of participating in the NZ scheme (for reasons of exploitation and social issues arising from the scheme), yet RSE's recruitment numbers are growing steadily and meeting their output and productivity goals. The reasons for the steady growth of RSE's worker count and productivity is owed to their insightful strategies around worker engagement discussed below: \\
 
-       \begin{figure*}[tp] % t for position at the top of the current page; b for position at the bottom; p for new page
-		\centering
-		  \begin{subfigure}[b]{0.3\linewidth} % Fig (a)
-			\includegraphics[width=\linewidth]{figures/RSEP1.png}
-			%\caption{Example left figure.}
-			\label{fig:figa}
-		\end{subfigure}
-			\hspace{1pt}   % Space between the figures
-		\begin{subfigure}[b]{0.3\linewidth} % Fig (b)
-			\includegraphics[width=\linewidth]{figures/RSEP2.png}
-			%\caption{Example right figure.}
-			\label{fig:figb}
-		\end{subfigure}
-		\caption{Summary infographic of RSE productivity and engagement insights \cite{PFGPlots}.}
-		\label{fig:examplefloat}
-	\end{figure*}
+%       \begin{figure*}[tp] % t for position at the top of the current page; b for position at the bottom; p for new page
+%		\centering
+%		  \begin{subfigure}[b]{0.3\linewidth} % Fig (a)
+%			\includegraphics[width=\linewidth]{figures/RSEP1.png}
+%	\end{subfigure}
+%			\hspace{1pt}   % Space between the figures
+%		\begin{subfigure}[b]{0.3\linewidth} % Fig (b)
+%			\includegraphics[width=\linewidth]{figures/RSEP2.png}
+%			%\caption{Example right figure.}
+%			\label{fig:figb}
+%		\end{subfigure}
+%%cite{PFGPlots}.}
+%		\label{fig:examplefloat}
+%	\end{figure*}
 
 \subsection{Insights from RSE worker productivity}
 
@@ -410,7 +410,7 @@ In final, for Tonga, where 67\% of PALM workers rely on short-term roles, this t
 
        \item \textbf{Older/Younger or Single/Married?} - Findings from the RSE Remittance Pilot Project show that older workers and those who are married tend to remit more frequently, and send home larger aggregate amounts, than younger workers and those who are single. Therefore, if remittances are considered the primary gain from participation in seasonal work, it makes sense for employers to recruit older, married workers. However, research on the Canadian Seasonal Agricultural Workers Program (SAWP)has found that employers’ preference for older workers with children and/or other dependents exacerbates negative impacts on families, illustrating there can be trade-offs between the financial gains and social costs for migrant households. Tonga reports over 56\% of the labor mobility population is under the age of 30.  
 
-    \item \textbf{Diminishing marginal return} - RSE workers’ earnings tend to plateau around the fourth season of work, suggesting that employers may not have additional productivity gains by bringing back the same workers in successive seasons beyond their fourth year.
+    \item \textbf{Diminishing motivations} - A number of employers are finding a reduction in work ethic among workers returning for successive seasons. RSE workers’ earnings tend to plateau around the fourth season of work, suggesting that employers may not have additional productivity gains by bringing back the same workers in successive seasons beyond their fourth year.
 
 
 
@@ -439,7 +439,55 @@ In final, for Tonga, where 67\% of PALM workers rely on short-term roles, this t
 \section{Policy}
 \subsection{Existing PIC policies}
 
-Tonga manages its PALM and RSE schemes through the Tonga Labour Mobility Policy and Labour Mobility Operations Manual. This dictates recruitment processes, pre-departure activities, welfare and wellbeing requirements and returned worker support. It is of interest to note of existing policies in other PICs that could inform Tonga's policy reform summarized below:
+%\subsubsection{Tonga's Policy}
+
+Tonga manages its PALM and RSE schemes through the Tonga Labor Mobility Supply Management Strategy (TLMSMS). The key priority areas are to strengthen Tonga's labor mobility governance and stakeholder coordination, and to emphasize the need for skills development and private sector engagement to improve domestic capacity - see \textit{Figure 7} below.
+
+\begin{figure}[h!]
+\centering
+\begin{tikzpicture}[every node/.style={font=\sffamily},
+hub/.style={circle, draw=black, thick, minimum size=22mm, align=center, fill=red!40},
+spoke/.style={rectangle, draw=blue, rounded corners, minimum width=34mm, minimum height=8mm, align=center, fill=white}
+]
+
+
+% Hub
+\node[hub] (hub) {Tonga Labour\\Mobility Strategy\\2022};
+
+
+% Spokes positions (angles)
+\foreach \ang/\name in {90/Improved worker\\selection and\\Recruitment, 30/Targeted\\Reintegration\\programme, -30/Skills\\Development, -90/Private\\Sector\\Engagement, -150/Data\\management, 150/Private\\Sector\\Engagement2} {
+% The last label duplicates to keep layout symmetrical — we'll replace one with spacing
+}
+
+
+% Place the six nodes manually for better control
+\node[spoke] (n1) at ($(hub) + (0,3.2)$) {Improved worker selection\\and Recruitment};
+\node[spoke] (n2) at ($(hub) + (2.8,1.6)$) {Targeted Reintegration\\programme};
+\node[spoke] (n3) at ($(hub) + (2.8,-1.6)$) {Skills Development \\ (TVET alignment)};
+\node[spoke] (n4) at ($(hub) + (0,-3.2)$) {Private Sector\\Engagement};
+\node[spoke] (n5) at ($(hub) + (-2.8,-1.6)$) {Data management};
+\node[spoke] (n6) at ($(hub) + (-2.8,1.6)$) {Stakeholder\\Coordination}; % optional extra label for symmetry - you can replace
+
+
+% Draw connectors
+\foreach \n in {n1,n2,n3,n4,n5,n6}{
+\draw[->, thick] (hub) -- (\n);
+}
+
+
+% Optional: draw a soft background circle
+%\begin{scope}[on background layer]
+%\draw[rounded corners=12pt, fill=blue!3, draw=none] ($(hub)+(-4.2,-4.2)$) rectangle ($(hub)+(4.2,4.2)$);
+%\end{scope}
+\end{tikzpicture}
+\caption*{\textbf{Figure 7} TLMSMS implementation areas}
+\end{figure}
+
+It is of interest to note of existing policies in other PICs that could inform Tonga's policy reform summarized below:
+
+%recruitment processes, pre-departure activities, welfare and wellbeing requirements and returned worker support.
+
 
 \begin{itemize}
 \item \textbf{Samoa's Labor Mobility Policy} - In 2023, Samoa's government approved a new labor mobility policy that targetted two key areas: 
@@ -462,6 +510,7 @@ Tonga manages its PALM and RSE schemes through the Tonga Labour Mobility Policy 
 
 The policy responses from Samoa and Vanuatu are strongly relevant to Tonga's position given that the issues they are addressing are the same issues Tonga is facing around worker exploitation, family dynamics, data collection, and reintegration processes for returning workers.
 
+ 
 
 \subsection{Tonga's policy recommendation}
 
@@ -478,7 +527,9 @@ The policy responses from Samoa and Vanuatu are strongly relevant to Tonga's pos
         \end{itemize}
 \end{tauenv}
 
- To strengthen Tonga’s labor mobility scheme, several policy gaps must be addressed in light of experiences from PALM, RSE, and other Pacific countries. First, \textbf{there is a clear need to target skill development of Tongan workers for more long-term roles}, where in the case of PALM, short-term contracts have become less viable under recent compliance revisions, and greater training would allow Tongans to remain competitive in higher-value positions. The SET project (P161541) financed (US\$1.8 million) to cater for pre-departure trainings, selection criterias to target low-skilled and disadvantaged households, and, finally, supply informative sessions on pathways to long-term/higher skilled migration. This could be complemented by industry-specific trainings such as meat-processing or aged-care facility trainings.
+%\noindent Tonga’s human capital is its largest exports, and to capitalize on this flow we focus on two pathways- either increasing the number of participants \textit{OR} increasing average earnings – which would increase remittance flows. As of current, the count of 
+ 
+ To strengthen Tonga’s labor mobility scheme, several policy gaps must be addressed in light of experiences from PALM, RSE, and other Pacific countries. First, \textbf{there is a clear need to target the skill development of Tongan workers towards more long-term roles}, where in the case of PALM, short-term contracts have become less viable under recent compliance revisions, and greater training would allow Tongans to remain competitive in higher-value positions. The SET project (P161541) financed (US\$1.8 million) to cater for pre-departure trainings, selection criterias to target low-skilled and disadvantaged households, and, finally, supply informative sessions on pathways to long-term/higher skilled migration. This could be complemented by industry-specific trainings such as meat-processing or aged-care facility trainings. In fact, the \textbf{\href{https://pacificaustraliaskills.org/}}{Pacific Australia Skills} programme could be utilized to develop the skill sets of our Tongan workers.
  
  At the same time, from RSE, insights on productivity and reintegration strategies are critical to ensure that new and returning workers are engaged and can transition their earnings and acquired skills back into the domestic economy. As cited by RSE, \textbf{ensuring frequent worker rotations} brings in new workers and \textbf{establishing handover training sessions} from previous seasonal workers will prove helpful.
 
