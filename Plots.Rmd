@@ -1,0 +1,323 @@
+---
+title: "LaborMobility"
+author: "Antonio"
+date: "2025-09-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+##Growth in PALM scheme 
+##Drop in Tonga's scheme 
+df <- data.frame(
+  place <- c("Total", "Tonga"),
+  `2022` <- c(26185, 6035),
+  `2024` <- c(30705, 3175)
+)
+
+theme_set(theme_classic())
+colnames(df)<- c("Place","2022", "2025")
+left_label <- paste(df$Place, round(df$`2022`),sep=", ")
+right_label <- paste(df$Place, round(df$`2025`),sep=", ")
+df$class <- ifelse((df$`2025` - df$`2022`) < 0, "red", "green")
+
+# Plot
+p <- ggplot(df) + geom_segment(aes(x=1, xend=2, y=`2022`, yend=`2025`, col=class), size=.75, show.legend=F) + 
+                  geom_vline(xintercept=1, linetype="dashed", size=.1) + 
+                  geom_vline(xintercept=2, linetype="dashed", size=.1) +
+                  scale_color_manual(labels = c("Up", "Down"), 
+                                     values = c("green"="#00ba38", "red"="#f8766d")) +  # color of lines
+                  labs(x="", y="Workers (PALM)") +  # Axis labels
+                  xlim(.5, 2.5) + ylim(0,1.1*((max(df$`2022`, df$`2025`))))  # X and Y axis limits
+
+# Add text
+p <- p + geom_text(label=left_label, y=df$`2022`, x=rep(1, NROW(df)), hjust=1.1, size=3.5)
+p <- p + geom_text(label=right_label, y=df$`2025`, x=rep(2, NROW(df)), hjust=-0.1, size=3.5)
+p <- p + geom_text(label="Year 2022", x=1, y=1.1*(max(df$`2022`, df$`2025`)), hjust=1.2, size=5)  # title
+p <- p + geom_text(label="Year 2025", x=2, y=1.1*(max(df$`2022`, df$`2025`)), hjust=-0.1, size=5)  # title
+
+# Minify theme
+p + theme(panel.background = element_blank(), 
+           panel.grid = element_blank(),
+           axis.ticks = element_blank(),
+           axis.text.x = element_blank(),
+           panel.border = element_blank(),
+           plot.margin = unit(c(1,2,1,2), "cm"))
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(hrbrthemes)
+library(babynames)
+library(viridis)
+
+
+df <- data.frame(
+  Date = c("Apr-22", "Dec-22", "Jun-23", "Jul-23", "Aug-23", "Sept-23", "Oct-23", "Nov-23", "Dec-23", "Jan-24", 
+           "Feb-24", "Mar-24", "Apr-24", "May-24", "Jun-24", "Jul-24", "Aug-24", "Sept-24", "Oct-24", "Nov-24", "Dec-24", "Jan-25"),
+  Total = c(26185, 29955, 34400, 34110, 33825, 33690, 33900, 32895, 29910, 32580, 
+            33245, 33680, 32560, 34230, 34320, 31950, 30805, 31230, 30800, 31305, 27620, 30705),
+  Fiji = c(1630, 4510, 6270, 6290, 6240, 6190, 6540, 5780, 5410, 5780, 
+           5680, 6020, 6020, 6475, 6695, 6365, 5995, 5830, 5915, 5740, 4865, 5315),
+  Kiribati = c(785, 800, 1220, 1285, 1245, 1300, 1430, 1445, 1425, 1540, 
+               1500, 1515, 1515, 1595, 1665, 1555, 1555, 1500, 1535, 1500, 1365, 1550),
+  Nauru = c(10, 5, 5, 5, 5, 5, 5, 5, 10, 15, 
+            15, 25, 25, 25, 35, 35, 35, 25, 35, 25, 50, 55),
+  PNG = c(385, 1085, 1610, 1665, 1735, 1765, 1765, 1735, 1415, 1690, 
+          1820, 1810, 1830, 1935, 1935, 1960, 1960, 1870, 2025, 2045, 2020, 2050),
+  Samoa = c(4085, 4130, 4125, 4005, 3805, 3605, 3605, 3375, 3215, 3380, 
+            3585, 3480, 3540, 3245, 3245, 2865, 2865, 2740, 2575, 2630, 2725, 2690),
+  Solomon_Islands = c(2925, 3370, 4590, 4690, 4840, 4945, 4890, 4985, 3980, 4530, 
+                      4760, 4730, 4730, 5120, 5085, 4820, 4820, 4870, 4570, 4745, 4450, 4645),
+  Timor_Leste = c(1715, 3405, 3375, 3340, 3525, 3940, 4015, 3895, 3865, 3850, 
+                  4245, 4230, 3960, 3750, 4750, 3760, 3760, 3430, 3390, 4735, 4425, 4865),
+  Tonga = c(6035, 4350, 5320, 5220, 4950, 4825, 4085, 3895, 3585, 3850, 
+            4070, 4070, 4070, 4165, 4165, 3980, 3980, 3830, 2995, 3025, 2725, 3175),
+  Tuvalu = c(10, 35, 80, 75, 75, 125, 135, 165, 185, 185, 
+             210, 210, 210, 260, 260, 310, 310, 300, 295, 310, 275, 295),
+  Vanuatu = c(8600, 8265, 7535, 7410, 7410, 7325, 7425, 7275, 6770, 6630, 
+              7085, 7035, 6635, 6375, 6375, 6120, 5985, 5835, 5900, 5885, 6060, 6060)
+)
+
+PALM_long <- df %>%
+  pivot_longer(cols = c(Fiji, Kiribati, Nauru, PNG, Samoa, Solomon_Islands, Timor_Leste, Tonga, Tuvalu, Vanuatu), names_to = "Category", values_to = "Workers")
+
+library(lubridate)
+PALM_long$Date <- parse_date_time(PALM_long$Date, "my")
+
+
+#install.packages("zoo")
+library(zoo)
+
+PALM_long$Date <- as.Date(as.yearmon(PALM_long$Date, "%b-%y"))
+# Plot
+PALM_long%>%
+  ggplot( aes(x=Date, y=Workers, group=Category, color=Category)) +
+    geom_line() +
+    scale_color_viridis(discrete = TRUE) +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=14)
+    ) +
+    ggtitle("PALM scheme workers by country") +
+    theme_ipsum()
+
+```
+
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(hrbrthemes)
+library(babynames)
+library(viridis)
+
+
+
+df <- data.frame(
+  Date = c("Apr-22", "Dec-22", "Jun-23", "Jul-23", "Aug-23", "Sept-23", "Oct-23", "Nov-23", "Dec-23", "Jan-24", 
+           "Feb-24", "Mar-24", "Apr-24", "May-24", "Jun-24", "Jul-24", "Aug-24", "Sept-24", "Oct-24", "Nov-24", "Dec-24", "Jan-25"),
+  Total = c(26185, 29955, 34400, 34110, 33825, 33690, 33900, 32895, 29910, 32580, 
+            33245, 33680, 32560, 34230, 34320, 31950, 30805, 31230, 30800, 31305, 27620, 30705),
+  Fiji = c(1630, 4510, 6270, 6290, 6240, 6190, 6540, 5780, 5410, 5780, 
+           5680, 6020, 6020, 6475, 6695, 6365, 5995, 5830, 5915, 5740, 4865, 5315),
+  Kiribati = c(785, 800, 1220, 1285, 1245, 1300, 1430, 1445, 1425, 1540, 
+               1500, 1515, 1515, 1595, 1665, 1555, 1555, 1500, 1535, 1500, 1365, 1550),
+  Nauru = c(10, 5, 5, 5, 5, 5, 5, 5, 10, 15, 
+            15, 25, 25, 25, 35, 35, 35, 25, 35, 25, 50, 55),
+  PNG = c(385, 1085, 1610, 1665, 1735, 1765, 1765, 1735, 1415, 1690, 
+          1820, 1810, 1830, 1935, 1935, 1960, 1960, 1870, 2025, 2045, 2020, 2050),
+  Samoa = c(4085, 4130, 4125, 4005, 3805, 3605, 3605, 3375, 3215, 3380, 
+            3585, 3480, 3540, 3245, 3245, 2865, 2865, 2740, 2575, 2630, 2725, 2690),
+  Solomon_Islands = c(2925, 3370, 4590, 4690, 4840, 4945, 4890, 4985, 3980, 4530, 
+                      4760, 4730, 4730, 5120, 5085, 4820, 4820, 4870, 4570, 4745, 4450, 4645),
+  Timor_Leste = c(1715, 3405, 3375, 3340, 3525, 3940, 4015, 3895, 3865, 3850, 
+                  4245, 4230, 3960, 3750, 4750, 3760, 3760, 3430, 3390, 4735, 4425, 4865),
+  Tonga = c(6035, 4350, 5320, 5220, 4950, 4825, 4085, 3895, 3585, 3850, 
+            4070, 4070, 4070, 4165, 4165, 3980, 3980, 3830, 2995, 3025, 2725, 3175),
+  Tuvalu = c(10, 35, 80, 75, 75, 125, 135, 165, 185, 185, 
+             210, 210, 210, 260, 260, 310, 310, 300, 295, 310, 275, 295),
+  Vanuatu = c(8600, 8265, 7535, 7410, 7410, 7325, 7425, 7275, 6770, 6630, 
+              7085, 7035, 6635, 6375, 6375, 6120, 5985, 5835, 5900, 5885, 6060, 6060)
+)
+
+PALM_long <- df %>%
+  pivot_longer(cols = c(Fiji, Kiribati, Nauru, PNG, Samoa, Solomon_Islands, Timor_Leste, Tonga, Tuvalu, Vanuatu), names_to = "Category", values_to = "Workers")
+
+library(lubridate)
+PALM_long$Date <- parse_date_time(PALM_long$Date, "my")
+
+library(zoo)
+
+PALM_long$Date <- as.Date(as.yearmon(PALM_long$Date, "%b-%y"))
+
+
+PALM_long %>%
+  mutate( highlight = ifelse(Category == "Tonga", "Tonga", "Other")) %>%
+  ggplot(aes(x = Date, y = Workers, group = Category, color = highlight)) +
+  geom_line() +
+  scale_color_manual(values = c("lightgrey", "red")) +
+  scale_size_manual(values=c(2,0.2))+
+  scale_x_date(date_breaks = "3 months", date_labels = "%b-%y") +
+  ggtitle("PALM scheme intake from 2022-2025") +
+  theme_ipsum() +
+  geom_label(aes(x = as.Date("2024-02-01"), y = 5500, 
+                  label = "Tonga's PALM intake is declining"), 
+             color = "red", size = 3, label.size = 0.3)+
+  theme(
+    plot.title = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+```
+
+```{r}
+tonga_data <- df_with_changes %>% 
+  filter(Category == "Tonga") %>%
+  mutate(Change_Type = ifelse(Monthly_Change > 0, "Increase", 
+                             ifelse(Monthly_Change < 0, "Decrease", "No Change")))
+
+ggplot(tonga_data, aes(x = Date, y = Workers)) +
+  geom_line(color = "#1f77b4", linewidth = 1) +
+  geom_point(aes(color = Change_Type), size = 3) +
+  geom_text(aes(label = ifelse(!is.na(Monthly_Change), 
+                              paste0(ifelse(Monthly_Change > 0, "+", ""), 
+                                     Monthly_Change), "")),
+            vjust = -1, size = 3) +
+  scale_color_manual(values = c("Decrease" = "#d62728", 
+                               "Increase" = "#2ca02c",
+                               "No Change" = "#ff7f0e")) +
+  labs(title = "Tonga PALM Workers: Monthly intake",
+       subtitle = "Annotations show net monthly additions/losses",
+       y = "Number of Workers",
+       color = "Change Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
+```{r}
+
+# Step 1: Create the data frame
+rse_tonga <- data.frame(
+  Financial_year = c("2007/08", "2008/09", "2009/10", "2010/11", "2011/12",
+                    "2012/13", "2013/14", "2014/15", "2015/16", "2016/17",
+                    "2017/18", "2018/19", "2019/20", "2020/21", "2021/22",
+                    "2022/23", "2023/24", "2024/25"),
+  RSE_workers = c(805, 1355, 1142, 1411, 1398, 1573, 1600, 1563, 1687, 1822, 1899, 2037, 1807, 826, 957, 1202, 1307, 1608)
+)
+
+# Step 2: Convert financial year to proper date format (using July as midpoint)
+rse_tonga$Year <- as.numeric(substr(rse_tonga$Financial_year, 1, 4)) + 0.5
+
+# Step 3: Create the trend plot
+library(ggplot2)
+
+ggplot(rse_tonga, aes(x = Year, y = RSE_workers)) +
+  geom_line(color = "#2c7bb6", linewidth = 1.2) +
+  geom_point(color = "#d7191c", size = 3) +
+  labs(title = "Trend of Tongan Workers in NZ's RSE Scheme (2007-2025)",
+       x = "Year",
+       y = "Number of RSE Workers",
+       caption = "Source: New Zealand RSE Scheme Data") +
+  scale_x_continuous(breaks = seq(2007.5, 2024.5, by = 2),
+                   labels = paste0(seq(2007, 2024, by = 2), "/", seq(2008, 2025, by = 2))) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        panel.grid.minor = element_blank())
+
+
+```
+
+
+```{r}
+
+# Create the data frame
+visa_data <- data.frame(
+  Year = c("2005-06", "2006-07", "2007-08", "2008-09", "2009-10", 
+           "2010-11", "2011-12", "2012-13", "2013-14", "2014-15",
+           "2015-16", "2016-17", "2017-18", "2018-19", "2019-20",
+           "2020-21", "2021-22", "2022-23", "2023-24"),
+  Visas_417 = c(114693, 134993, 154339, 187907, 175746, 
+               185480, 214644, 249231, 229378, 214830,
+               195673, 191955, 185450, 180223, 122673,
+               31207, 79896, 178306, 193922),
+  Visas_462 = c(751, 1812, 3488, 6409, 7422, 
+              7442, 8348, 9017, 10214, 11982,
+              18910, 19056, 25006, 28813, 26576,
+              8379, 17463, 46125, 40634),
+  Grand_Total = c(115444, 136805, 157827, 194316, 183168,
+                192922, 222992, 258248, 239592, 226812,
+                214583, 211011, 210456, 209036, 149249,
+                39586, 97359, 224431, 234556)
+)
+
+# Convert to long format for ggplot
+library(tidyr)
+visa_long <- pivot_longer(visa_data, 
+                         cols = c(Visas_417, Visas_462),
+                         names_to = "Visa_Type",
+                         values_to = "Count")
+
+# Create stacked bar plot
+library(ggplot2)
+ggplot(visa_long, aes(x = Year, y = Count, fill = Visa_Type)) +
+  geom_bar(stat = "identity") +
+  scale_fill_manual(values = c("#1f77b4", "#ff7f0e"),
+                    labels = c("417 Visas", "462 Visas")) +
+  labs(title = "Australian Working Holiday Visas (2005-2024)",
+       subtitle = "Breakdown of 417 vs 462 Visa Types",
+       x = "Financial Year",
+       y = "Number of Visas Issued",
+       fill = "Visa Type",
+       caption = "Source: Australian Department of Home Affairs") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5),
+        legend.position = "top") +
+  scale_y_continuous(labels = scales::comma)
+
+# Optional: Save the plot
+#ggsave("australia_working_holiday_visas.png", width = 12, height = 6, dpi = 300)
+
+
+```
+
+```{r}
+
+# Create the data frame
+imputed_data <- data.frame(
+  Year = c("2018-19", "2019-20", "2020-21", "2021-22", "2022-23", "2023-24"),
+  Workers = c(36125, 27576, 28600, 7751, 14493, 27231)
+)
+
+# Create bar plot
+library(ggplot2)
+ggplot(imputed_data, aes(x = Year, y = Workers)) +
+  geom_bar(stat = "identity", fill = "#1f77b4", width = 0.7) +
+  geom_text(aes(label = scales::comma(Workers)), vjust = -0.5, size = 3.5) +
+  labs(title = "Backpackers in Agriculture",
+       x = "Financial Year",
+       y = "Imputed Value",
+       caption = "* workers") +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+        panel.grid.major.x = element_blank())
+
+# Optional: Save the plot
+ggsave("imputed_values_plot.png", width = 8, height = 6, dpi = 300)
+
+```
+
